@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { Order, CreateOrderInput } from '../types/order.types';
+import type { Task } from '../types/task.types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -43,6 +44,14 @@ export const ordersApi = {
       ...(failureReason !== undefined && { failureReason }),
     });
     if (!data.success) throw new Error('Failed to update status');
+    return data.data;
+  },
+
+  getTasks: async (orderMongoId: string): Promise<Task[]> => {
+    const { data } = await api.get<{ success: boolean; data: Task[] }>(
+      `/api/orders/${orderMongoId}/tasks`
+    );
+    if (!data.success) throw new Error('Failed to fetch tasks');
     return data.data;
   },
 };

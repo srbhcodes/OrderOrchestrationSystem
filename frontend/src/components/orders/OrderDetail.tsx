@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ordersApi } from '../../services/api';
 import type { Order, OrderStatus } from '../../types/order.types';
+import type { Task } from '../../types/task.types';
 import { NEXT_STATES } from '../../types/order.types';
 
 const statusColors: Record<string, string> = {
@@ -18,6 +19,7 @@ export function OrderDetail() {
   const [error, setError] = useState<string | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [failReason, setFailReason] = useState('');
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchOrder = async () => {
     if (!id) return;
@@ -25,8 +27,19 @@ export function OrderDetail() {
       setError(null);
       const data = await ordersApi.getById(id);
       setOrder(data);
+      return data;
     } catch (e: any) {
       setError(e.message || 'Failed to load order');
+    }
+  };
+
+  const fetchTasks = async () => {
+    if (!id) return;
+    try {
+      const data = await ordersApi.getTasks(id);
+      setTasks(data);
+    } catch {
+      setTasks([]);
     }
   };
 
@@ -35,8 +48,11 @@ export function OrderDetail() {
     let cancelled = false;
     const load = async () => {
       setLoading(true);
-      await fetchOrder();
+      const orderData = await fetchOrder();
       setLoading(false);
+      if (!cancelled && orderData?.status === 'IN_PROGRESS') {
+        fetchTasks();
+      }
     };
     load();
     return () => { cancelled = true; };
@@ -54,6 +70,7 @@ export function OrderDetail() {
       );
       setOrder(updated);
       setFailReason('');
+      if (updated.status === 'IN_PROGRESS') fetchTasks();
     } catch (e: any) {
       setError(e.response?.data?.message || e.message || 'Failed to update status');
     } finally {
@@ -119,6 +136,49 @@ export function OrderDetail() {
               ))}
             </ul>
           </dd>
+        </div>
+      )}
+
+      {tasks.length > 0 && (
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <h3 className="mb-2 text-sm font-medium text-gray-700">Tasks</h3>
+          <ul className="space-y-2">
+            {tasks.map((task) => (
+              <li
+                key={task.taskId}
+                className="rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+              >
+                <span className="font-medium">{task.taskId}</span>
+                <span className="mx-2 text-gray-500">({task.taskType})</span>
+                <span
+                  className={`inline-flex rounded px-1.5 py-0.5 text-xs font-medium ${
+                    task.status === 'COMPLETED'
+                      ? 'bg-green-100 text-green-800'
+                      : task.status === 'FAILED'
+                      ? 'bg-red-100 text-red-800'
+                      : task.status === 'RUNNING'
+                      ? 'bg-blue-100 text-blue-800'
+                      : task.status === 'READY'
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {task.status}
+                </span>
+                {task.dependsOn?.length > 0 && (
+                  <div className="mt-1 text-gray-500">
+                    Depends on: {task.dependsOn.join(', ')}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-2">
+            <p className="text-xs font-medium text-gray-500">Dependency flow (text)</p>
+            <p className="mt-0.5 font-mono text-xs text-gray-600">
+              {tasks.map((t) => t.taskId).join(' → ')}
+            </p>
+          </div>
         </div>
       )}
 

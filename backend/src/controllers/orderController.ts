@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { orderService } from '../services/order/orderService';
+import { generateAndPersistTasks } from '../services/task/taskService';
 
 export const orderController = {
   async create(req: Request, res: Response) {
@@ -75,6 +76,15 @@ export const orderController = {
       }
       if (!result.order) {
         return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+      if (result.order.status === 'IN_PROGRESS') {
+        const taskResult = await generateAndPersistTasks(
+          result.order.orderId,
+          result.order.orderType
+        );
+        if (taskResult.error) {
+          console.error('Task generation error:', taskResult.error);
+        }
       }
       return res.json({ success: true, data: result.order });
     } catch (error: any) {
