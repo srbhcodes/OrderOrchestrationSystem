@@ -1,8 +1,19 @@
 import { Request, Response } from 'express';
-import { listByOrderId } from '../services/task/taskService';
+import { listByOrderId, listAll } from '../services/task/taskService';
 import { orderService } from '../services/order/orderService';
 
 export const taskController = {
+  async list(req: Request, res: Response) {
+    try {
+      const orderId = req.query.orderId as string | undefined;
+      const tasks = orderId ? await listByOrderId(orderId) : await listAll();
+      return res.json({ success: true, data: tasks });
+    } catch (error: any) {
+      console.error('Task list error:', error);
+      return res.status(500).json({ success: false, message: error.message || 'Failed to list tasks' });
+    }
+  },
+
   async listByOrder(req: Request, res: Response) {
     try {
       const orderId = req.query.orderId as string;

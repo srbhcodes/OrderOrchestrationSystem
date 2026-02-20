@@ -46,3 +46,7 @@ export async function listByOrderId(orderId: string): Promise<ITask[]> {
 export async function getByTaskId(taskId: string): Promise<ITask | null> {
   return Task.findOne({ taskId }).lean();
 }
+
+export async function listAll(): Promise<ITask[]> {
+  return Task.find().sort({ createdAt: -1 }).limit(200).lean();
+}

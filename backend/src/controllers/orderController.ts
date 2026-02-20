@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { orderService } from '../services/order/orderService';
 import { generateAndPersistTasks } from '../services/task/taskService';
+import { enqueueReadyTasksForOrder } from '../queues/taskQueue';
 
 export const orderController = {
   async create(req: Request, res: Response) {
@@ -84,8 +85,12 @@ export const orderController = {
         );
         if (taskResult.error) {
           console.error('Task generation error:', taskResult.error);
+        } else {
+          await enqueueReadyTasksForOrder(result.order.orderId);
         }
       }
+      const io = (global as any).io;
+      if (io) io.to('orders').emit('order:updated', { orderId: result.order.orderId });
       return res.json({ success: true, data: result.order });
     } catch (error: any) {
       console.error('Order updateStatus error:', error);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ordersApi } from '../../services/api';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 import type { Order } from '../../types/order.types';
 
 const statusColors: Record<string, string> = {
@@ -14,6 +15,7 @@ export function OrderList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { orderUpdateTrigger } = useWebSocket();
 
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +33,7 @@ export function OrderList() {
     };
     fetchOrders();
     return () => { cancelled = true; };
-  }, []);
+  }, [orderUpdateTrigger]);
 
   if (loading) {
     return (

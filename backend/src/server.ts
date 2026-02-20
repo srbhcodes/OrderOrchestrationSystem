@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import { redisClient } from './config/redis';
 import orderRoutes from './routes/orderRoutes';
+import taskRoutes from './routes/taskRoutes';
+import { startTaskWorker } from './queues/workers/taskWorker';
 
 dotenv.config();
 
@@ -27,6 +29,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 app.use('/api/orders', orderRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Socket.io connection
 io.on('connection', (socket) => {
@@ -51,7 +54,8 @@ const PORT = process.env.PORT || 3001;
 async function startServer() {
   try {
     await connectDatabase();
-    
+    startTaskWorker();
+
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });

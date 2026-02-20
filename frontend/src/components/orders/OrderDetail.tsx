@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ordersApi } from '../../services/api';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 import type { Order, OrderStatus } from '../../types/order.types';
 import type { Task } from '../../types/task.types';
 import { NEXT_STATES } from '../../types/order.types';
@@ -20,6 +21,7 @@ export function OrderDetail() {
   const [transitioning, setTransitioning] = useState(false);
   const [failReason, setFailReason] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
+  const { orderUpdateTrigger, taskUpdateTrigger } = useWebSocket();
 
   const fetchOrder = async () => {
     if (!id) return;
@@ -56,7 +58,12 @@ export function OrderDetail() {
     };
     load();
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, orderUpdateTrigger]);
+
+  useEffect(() => {
+    if (!id || !order || order.status !== 'IN_PROGRESS') return;
+    fetchTasks();
+  }, [taskUpdateTrigger]);
 
   const handleTransition = async (newStatus: OrderStatus) => {
     if (!id || !order) return;

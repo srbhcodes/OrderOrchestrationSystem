@@ -55,3 +55,12 @@ export const ordersApi = {
     return data.data;
   },
 };
+
+export const tasksApi = {
+  list: async (orderId?: string): Promise<Task[]> => {
+    const url = orderId ? `/api/tasks?orderId=${encodeURIComponent(orderId)}` : '/api/tasks';
+    const { data } = await api.get<{ success: boolean; data: Task[] }>(url);
+    if (!data.success) throw new Error('Failed to fetch tasks');
+    return data.data;
+  },
+};

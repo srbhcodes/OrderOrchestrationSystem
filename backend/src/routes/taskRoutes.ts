@@ -3,6 +3,6 @@ import { taskController } from '../controllers/taskController';
 
 const router = Router();
 
-router.get('/', taskController.listByOrder);
+router.get('/', taskController.list);
 
 export default router;
