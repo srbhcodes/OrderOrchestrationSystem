@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
+    "render-build": "npm install --include=dev && npm run build",
     "start": "node dist/backend/src/server.js"
   },
   "keywords": [],

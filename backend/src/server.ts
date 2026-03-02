@@ -25,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/health', (req, res) => {
+app.get('/health', (_req: express.Request, res: express.Response) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 app.use('/api/orders', orderRoutes);
