@@ -2,11 +2,11 @@
   "name": "telecom-order-orchestration-backend",
   "version": "1.0.0",
   "description": "Backend for Telecom Order Orchestration System",
-  "main": "dist/server.js",
+  "main": "dist/backend/src/server.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/backend/src/server.js"
   },
   "keywords": [],
   "author": "",

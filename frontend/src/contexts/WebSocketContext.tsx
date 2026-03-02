@@ -16,7 +16,7 @@ const WebSocketContext = createContext<WebSocketContextType>({
 });
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
   const [orderUpdateTrigger, setOrderUpdateTrigger] = useState(0);
   const [taskUpdateTrigger, setTaskUpdateTrigger] = useState(0);

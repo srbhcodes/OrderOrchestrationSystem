@@ -1,6 +1,11 @@
 import Redis from 'ioredis';
 
-export const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+
+export const redisClient = new Redis(redisUrl);
+
+/** BullMQ requires maxRetriesPerRequest: null for blocking commands */
+export const bullmqConnection = new Redis(redisUrl, { maxRetriesPerRequest: null });
 
 redisClient.on('connect', () => {
   console.log('✅ Redis connected');

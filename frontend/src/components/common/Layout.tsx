@@ -14,12 +14,14 @@ export function Layout() {
             <div className="flex items-center gap-4">
               <Link to="/" className="text-gray-600 hover:text-gray-900">Orders</Link>
               <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
+              <Link to="/flow" className="text-gray-600 hover:text-gray-900">Flow</Link>
               <Link to="/create" className="text-gray-600 hover:text-gray-900">Create Order</Link>
               <span
-                className={`rounded-full px-2 py-0.5 text-xs ${connected ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                title={connected ? 'Live updates' : 'Disconnected'}
+                className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium ${connected ? 'border-green-200 bg-green-50 text-green-700' : 'border-red-200 bg-red-50 text-red-700'}`}
+                title={connected ? 'Socket.io connected; order and task updates push in real time.' : 'Disconnected; refresh to see updates.'}
               >
-                {connected ? '● Live' : '○ Off'}
+                {connected && <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" aria-hidden />}
+                {connected ? 'LIVE' : 'Off'}
               </span>
             </div>
           </div>

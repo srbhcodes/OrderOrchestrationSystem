@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import { redisClient } from '../../config/redis';
+import { bullmqConnection } from '../../config/redis';
 import { executeTask } from '../../services/task/taskExecutor';
 import { onTaskCompleted, onTaskFailed, tryRetryOrFail } from '../../services/task/orchestration';
 
@@ -24,7 +24,7 @@ export function startTaskWorker(): void {
       }
     },
     {
-      connection: redisClient,
+      connection: bullmqConnection as any,
       concurrency: 1,
     }
   );

@@ -1,11 +1,11 @@
 import { Queue } from 'bullmq';
-import { redisClient } from '../config/redis';
+import { bullmqConnection } from '../config/redis';
 import Task from '../models/Task';
 
 const QUEUE_NAME = 'task-execution';
 
 export const taskQueue = new Queue(QUEUE_NAME, {
-  connection: redisClient,
+  connection: bullmqConnection as any,
   defaultJobOptions: {
     attempts: 1,
     removeOnComplete: { count: 100 },

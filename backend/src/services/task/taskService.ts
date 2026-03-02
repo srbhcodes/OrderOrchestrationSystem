@@ -9,7 +9,8 @@ export async function generateAndPersistTasks(
 ): Promise<{ tasks: ITask[]; error?: string }> {
   const existing = await Task.find({ orderId }).lean();
   if (existing.length > 0) {
-    return { tasks: existing as ITask[] };
+    const tasks = existing as unknown as ITask[];
+    return { tasks };
   }
 
   const blueprint = generateTaskBlueprint(orderId, orderType);
@@ -33,20 +34,23 @@ export async function generateAndPersistTasks(
       maxRetries: 3,
     });
     await task.save();
-    tasks.push(task.toObject());
+    tasks.push(task.toObject() as unknown as ITask);
   }
 
   return { tasks };
 }
 
 export async function listByOrderId(orderId: string): Promise<ITask[]> {
-  return Task.find({ orderId }).sort({ createdAt: 1 }).lean();
+  const docs = await Task.find({ orderId }).sort({ createdAt: 1 }).lean();
+  return docs as unknown as ITask[];
 }
 
 export async function getByTaskId(taskId: string): Promise<ITask | null> {
-  return Task.findOne({ taskId }).lean();
+  const doc = await Task.findOne({ taskId }).lean();
+  return doc as unknown as ITask | null;
 }
 
 export async function listAll(): Promise<ITask[]> {
-  return Task.find().sort({ createdAt: -1 }).limit(200).lean();
+  const docs = await Task.find().sort({ createdAt: -1 }).limit(200).lean();
+  return docs as unknown as ITask[];
 }

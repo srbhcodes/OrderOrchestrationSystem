@@ -33,15 +33,18 @@ export const orderService = {
   },
 
   async findAll(): Promise<IOrder[]> {
-    return Order.find().sort({ createdAt: -1 }).lean();
+    const docs = await Order.find().sort({ createdAt: -1 }).lean();
+    return docs as unknown as IOrder[];
   },
 
   async findById(id: string): Promise<IOrder | null> {
-    return Order.findOne({ _id: id }).lean();
+    const doc = await Order.findOne({ _id: id }).lean();
+    return doc as unknown as IOrder | null;
   },
 
   async findByOrderId(orderId: string): Promise<IOrder | null> {
-    return Order.findOne({ orderId }).lean();
+    const doc = await Order.findOne({ orderId }).lean();
+    return doc as unknown as IOrder | null;
   },
 
   async updateStatus(
